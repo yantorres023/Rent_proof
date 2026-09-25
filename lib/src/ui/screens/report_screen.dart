@@ -204,7 +204,8 @@ class _ReportScreenState extends ConsumerState<ReportScreen> {
                 'package (a .zip with every original file, the report and a '
                 'list of fingerprints) and save it somewhere safe, like your '
                 'email or cloud storage, so it survives a lost or replaced '
-                'phone.',
+                'phone. Original photos may include location data written '
+                'by your camera.',
               ),
               const SizedBox(height: 8),
               OutlinedButton.icon(

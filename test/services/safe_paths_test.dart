@@ -1,5 +1,10 @@
 import 'package:flutter_test/flutter_test.dart';
+
+import 'dart:io';
+
+import 'package:path/path.dart' as p;
 import 'package:rentproof/src/services/safe_paths.dart';
+import 'package:rentproof/src/services/storage_paths.dart';
 
 void main() {
   group('safeExtension', () {
@@ -49,5 +54,29 @@ void main() {
     expect(slugForFileName('Maple Apt #4B / Café'), 'maple-apt-4b-caf');
     expect(slugForFileName('!!!'), 'export');
     expect(slugForFileName('a' * 100).length, 40);
+  });
+
+  test('discardPickerTemp only deletes files inside the app cache', () async {
+    final dir = await Directory.systemTemp.createTemp('rp_cache_');
+    addTearDown(() => dir.delete(recursive: true));
+    final paths = StoragePaths(
+      root: p.join(dir.path, 'support'),
+      exportRoot: p.join(dir.path, 'cache', 'rentproof_exports'),
+    );
+    File cacheFile(String rel) => File(p.join(dir.path, rel))
+      ..createSync(recursive: true)
+      ..writeAsStringSync('x');
+    final picked = cacheFile('cache/image_picker123.jpg');
+    final export = cacheFile('cache/rentproof_exports/report.pdf');
+    final outside = cacheFile('elsewhere/photo.jpg');
+    await paths.discardPickerTemp(picked.path);
+    await paths.discardPickerTemp(export.path);
+    await paths.discardPickerTemp(outside.path);
+    await paths.discardPickerTemp(
+      p.join(dir.path, 'cache', '..', 'elsewhere', 'photo.jpg'),
+    );
+    expect(picked.existsSync(), isFalse);
+    expect(export.existsSync(), isTrue);
+    expect(outside.existsSync(), isTrue);
   });
 }

@@ -66,3 +66,11 @@ _2026-09-25. Sources → `docs/research/SOURCES_REDTEAM.md`. No willingness-to-p
 3. Share of free users who reach move-out at all (retention through the tenancy). This is the biggest unknown.
 4. Whether a maintenance log creates mid-tenancy engagement.
 5. Partner-paid model (F): would universities, renters insurers or movers pay or co-brand? Requires outreach later.
+
+---
+
+## Lead amendments (2026-09-25)
+
+- **V1 ships with no purchases** (DECISIONS D-005). Every feature above, including move-out comparison, is free in the beta. The $9.99 Move-Out Pack and the $14.99 lifetime unlock stay the hypotheses to test once there are real users (VALIDATION_DEBT.md V-06).
+- **"Deadline reminders" are not in V1** (D-006). The state deadline data has not been verified against primary text.
+- If the pack is introduced later, the move-in report must stay complete and free, with no watermark and no crippled export. Move-out comparison must still work offline, with the purchase restored from the store receipt and no account.

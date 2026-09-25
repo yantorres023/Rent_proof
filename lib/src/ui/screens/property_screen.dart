@@ -12,14 +12,9 @@ import 'new_inspection_screen.dart';
 import 'property_form_screen.dart';
 
 class PropertyScreen extends ConsumerWidget {
-  const PropertyScreen({
-    super.key,
-    required this.propertyId,
-    this.offerFirstInspection = false,
-  });
+  const PropertyScreen({super.key, required this.propertyId});
 
   final String propertyId;
-  final bool offerFirstInspection;
 
   void _newInspection(BuildContext context) => Navigator.of(context).push(
     MaterialPageRoute(

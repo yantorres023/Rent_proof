@@ -220,6 +220,53 @@ PhotoMetadata readPhotoMetadata(Uint8List bytes) {
   }
 }
 
+/// Raw RGBA pixels decoded by the platform (see platform_preview.dart).
+class RgbaImage {
+  const RgbaImage(this.bytes, this.width, this.height);
+
+  final Uint8List bytes;
+  final int width;
+  final int height;
+}
+
+class DerivedFromRgbaRequest {
+  const DerivedFromRgbaRequest({
+    required this.image,
+    required this.previewDestPath,
+    required this.thumbnailDestPath,
+  });
+
+  final RgbaImage image;
+  final String previewDestPath;
+  final String thumbnailDestPath;
+}
+
+/// Writes preview and thumbnail JPEGs (no EXIF) from already-decoded pixels.
+/// Used when the pure-Dart decoder cannot read a format (e.g. HEIC) but the
+/// platform can. Intended to run inside `Isolate.run`.
+bool writeDerivedFromRgba(DerivedFromRgbaRequest req) {
+  try {
+    final src = img.Image.fromBytes(
+      width: req.image.width,
+      height: req.image.height,
+      bytes: req.image.bytes.buffer,
+      numChannels: 4,
+      order: img.ChannelOrder.rgba,
+    );
+    final preview = _resize(src, previewMaxEdge);
+    File(req.previewDestPath)
+        .writeAsBytesSync(img.encodeJpg(preview, quality: 82));
+    final thumb = _resize(preview, thumbnailMaxEdge);
+    File(req.thumbnailDestPath)
+        .writeAsBytesSync(img.encodeJpg(thumb, quality: 75));
+    return true;
+  } on Object {
+    _deleteQuietly(File(req.previewDestPath));
+    _deleteQuietly(File(req.thumbnailDestPath));
+    return false;
+  }
+}
+
 img.Image _resize(img.Image src, int maxEdge) {
   if (src.width <= maxEdge && src.height <= maxEdge) return src.clone();
   return src.width >= src.height

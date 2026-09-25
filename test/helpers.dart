@@ -105,3 +105,15 @@ Future<ReportFonts> loadTestFonts() async {
     italic: read('Roboto-Italic.ttf'),
   );
 }
+
+/// Controllable clock for deterministic timestamps in tests.
+class FixedClock implements Clock {
+  FixedClock(this.value);
+
+  DateTime value;
+
+  @override
+  DateTime now() => value;
+
+  void advance(Duration d) => value = value.add(d);
+}

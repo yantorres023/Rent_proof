@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:rentproof/src/data/database.dart';
 import 'package:rentproof/src/data/property_repository.dart';
+import 'package:rentproof/src/data/settings_repository.dart';
 
 import '../helpers.dart';
 
@@ -75,5 +76,37 @@ void main() {
     expect(await env.db.select(env.db.mediaEvidence).get(), isEmpty);
     expect(await env.db.select(env.db.evidenceHashes).get(), isEmpty);
     expect(original.existsSync(), isFalse);
+  });
+
+  test('delete all data erases rows and files', () async {
+    final p = await env.property();
+    final inspection = await env.inspections.create(
+      propertyId: p.id,
+      type: InspectionType.moveIn,
+    );
+    final rooms = await env.inspections.watchRoomProgress(inspection.id).first;
+    final media = await env.evidence.addMedia(
+      roomId: rooms.first.room.id,
+      sourcePath: env.writeJpeg('y.jpg').path,
+      kind: MediaKind.photo,
+      source: MediaSource.camera,
+    );
+    await env.reports.generate(inspection.id);
+    final settings = SettingsRepository(env.db, env.paths, clock: env.clock);
+    await settings.setOnboardingCompleted();
+    await settings.saveProfile(name: 'Alex', email: '');
+
+    await settings.deleteAllData();
+
+    for (final table in env.db.allTables) {
+      expect(
+        await env.db.select(table).get(),
+        isEmpty,
+        reason: table.actualTableName,
+      );
+    }
+    expect(File(env.evidence.originalFilePath(media)).existsSync(), isFalse);
+    expect(Directory(env.paths.reportsRoot).existsSync(), isFalse);
+    expect(await settings.watchOnboardingCompleted().first, isFalse);
   });
 }

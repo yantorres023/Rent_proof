@@ -32,10 +32,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     );
     if (created != null && context.mounted) {
       await Navigator.of(context).push(
-        MaterialPageRoute(
-          builder: (_) =>
-              PropertyScreen(propertyId: created, offerFirstInspection: true),
-        ),
+        MaterialPageRoute(builder: (_) => PropertyScreen(propertyId: created)),
       );
     }
   }

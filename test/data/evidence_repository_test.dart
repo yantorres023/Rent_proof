@@ -5,6 +5,9 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:rentproof/src/data/database.dart';
 import 'package:rentproof/src/data/evidence_repository.dart';
 import 'package:rentproof/src/data/property_repository.dart';
+
+import 'dart:typed_data';
+
 import 'package:rentproof/src/services/media_processing.dart';
 
 import '../helpers.dart';
@@ -193,5 +196,73 @@ void main() {
       () => env.evidence.addAnnotation(mediaId: m.id, x: double.nan, y: 0),
       throwsA(isA<ValidationException>()),
     );
+  });
+
+  test(
+    'platform decoder fallback derives previews for unreadable formats',
+    () async {
+      var called = 0;
+      final repo = EvidenceRepository(
+        env.db,
+        env.paths,
+        clock: env.clock,
+        processor: processMedia,
+        platformDecoder: (path) async {
+          called++;
+          // Pretend the platform decoded a 40x20 HEIC.
+          return RgbaImage(
+            Uint8List(40 * 20 * 4)..fillRange(0, 3200, 200),
+            40,
+            20,
+          );
+        },
+      );
+      final heic = env.writeBytes('IMG_0001.HEIC', List.filled(300, 9));
+      final m = await repo.addMedia(
+        roomId: roomId,
+        sourcePath: heic.path,
+        sourceFileName: 'IMG_0001.HEIC',
+        kind: MediaKind.photo,
+        source: MediaSource.import,
+      );
+      expect(called, 1);
+      expect(m.originalPath, endsWith('.heic'));
+      expect(m.mimeType, 'image/heic');
+      expect(m.width, 40);
+      expect(File(repo.previewFilePath(m)!).existsSync(), isTrue);
+      expect(File(repo.thumbnailFilePath(m)!).existsSync(), isTrue);
+      // Original untouched.
+      expect(
+        File(repo.originalFilePath(m)).readAsBytesSync(),
+        heic.readAsBytesSync(),
+      );
+    },
+  );
+
+  test('platform decoder is not called for readable JPEGs or videos', () async {
+    var called = 0;
+    final repo = EvidenceRepository(
+      env.db,
+      env.paths,
+      clock: env.clock,
+      processor: processMedia,
+      platformDecoder: (_) async {
+        called++;
+        return null;
+      },
+    );
+    await repo.addMedia(
+      roomId: roomId,
+      sourcePath: env.writeJpeg('ok.jpg').path,
+      kind: MediaKind.photo,
+      source: MediaSource.camera,
+    );
+    await repo.addMedia(
+      roomId: roomId,
+      sourcePath: env.writeBytes('v.mp4', List.filled(64, 1)).path,
+      kind: MediaKind.video,
+      source: MediaSource.camera,
+    );
+    expect(called, 0);
   });
 }

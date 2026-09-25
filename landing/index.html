@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Move-In Record — rental condition report</title>
+<meta name="description" content="Walk through your rental room by room, record any damage, and send your landlord a dated PDF condition report. Free, private, no account.">
+<link rel="icon" href="icon.png">
+<style>
+  :root {
+    --blue: #1F5AA6; --blue-dark: #174581; --ink: #1B1F23; --muted: #5B6770;
+    --bg: #F8F9FC; --card: #FFFFFF; --line: #DDE2EA; --green: #1E7A3C; --amber-bg: #FFF6E5;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --ink: #E8EBF0; --muted: #A9B3BD; --bg: #10151B; --card: #18202A; --line: #2A3441; --amber-bg: #2B2414; --blue: #7FA8E6; --blue-dark: #A9C4EE; }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; font: 17px/1.55 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; color: var(--ink); background: var(--bg); }
+  a { color: var(--blue); }
+  .wrap { max-width: 1040px; margin: 0 auto; padding: 0 20px; }
+  header { padding: 20px 0; display: flex; align-items: center; gap: 12px; }
+  header img { width: 40px; height: 40px; border-radius: 10px; }
+  header strong { font-size: 18px; }
+  .hero { padding: 48px 0 56px; display: grid; gap: 32px; grid-template-columns: 1.2fr 1fr; align-items: center; }
+  h1 { font-size: clamp(32px, 5vw, 50px); line-height: 1.1; margin: 0 0 16px; letter-spacing: -0.02em; }
+  .lead { font-size: 20px; color: var(--muted); margin: 0 0 28px; }
+  .cta { display: inline-block; background: var(--blue); color: #fff; padding: 14px 24px; border-radius: 999px; text-decoration: none; font-weight: 600; min-height: 48px; }
+  @media (prefers-color-scheme: dark) { .cta { color: #0B1520; } }
+  .cta:focus-visible, a:focus-visible { outline: 3px solid var(--blue-dark); outline-offset: 3px; }
+  .note { font-size: 14px; color: var(--muted); margin-top: 12px; }
+  .phone { background: var(--card); border: 1px solid var(--line); border-radius: 28px; padding: 18px; box-shadow: 0 10px 30px rgba(0,0,0,.08); }
+  .phone h3 { margin: 4px 0 12px; }
+  .row { border: 1px solid var(--line); border-radius: 14px; padding: 12px 14px; margin-bottom: 10px; }
+  .row b { display: block; }
+  .ok { color: var(--green); font-weight: 600; font-size: 14px; }
+  .todo { color: var(--muted); font-size: 14px; }
+  section { padding: 48px 0; border-top: 1px solid var(--line); }
+  h2 { font-size: 30px; margin: 0 0 20px; letter-spacing: -0.01em; }
+  .grid { display: grid; gap: 16px; grid-template-columns: repeat(3, 1fr); }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 20px; }
+  .card h3 { margin: 0 0 8px; font-size: 19px; }
+  .card p { margin: 0; color: var(--muted); }
+  ol.steps { counter-reset: s; list-style: none; padding: 0; display: grid; gap: 14px; grid-template-columns: repeat(5, 1fr); }
+  ol.steps li { background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 16px; }
+  ol.steps li::before { counter-increment: s; content: counter(s); display: inline-grid; place-items: center; width: 30px; height: 30px; border-radius: 50%; background: var(--blue); color: #fff; font-weight: 700; margin-bottom: 8px; }
+  .limits { background: var(--amber-bg); border-radius: 16px; padding: 20px 24px; }
+  details { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 14px 18px; margin-bottom: 10px; }
+  summary { cursor: pointer; font-weight: 600; min-height: 32px; }
+  footer { padding: 32px 0 48px; color: var(--muted); font-size: 14px; border-top: 1px solid var(--line); }
+  @media (max-width: 860px) {
+    .hero { grid-template-columns: 1fr; padding-top: 24px; }
+    .grid { grid-template-columns: 1fr; }
+    ol.steps { grid-template-columns: 1fr; }
+  }
+  @media (prefers-reduced-motion: no-preference) { html { scroll-behavior: smooth; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <img src="icon.png" alt="">
+    <strong>Move-In Record</strong>
+  </header>
+
+  <main>
+    <div class="hero">
+      <div>
+        <h1>Document your rental in one walkthrough.</h1>
+        <p class="lead">A guided, room-by-room check of your new place, before you unpack. Record what's already scratched, stained or broken, then send your landlord a clear, dated PDF report.</p>
+        <a class="cta" id="cta" href="#availability">Get the app</a>
+        <p class="note">Free. No account. Your photos stay on your phone.</p>
+      </div>
+      <div class="phone" aria-label="Illustration of the app's room checklist">
+        <h3>Kitchen</h3>
+        <div class="row"><b>Overview</b><span class="ok">✓ 2 added</span></div>
+        <div class="row"><b>Countertops</b><span class="ok">✓ 1 added · 1 issue</span></div>
+        <div class="row"><b>Sink &amp; faucet</b><span class="todo">○ Not documented</span></div>
+        <div class="row"><b>Stove &amp; oven</b><span class="todo">○ Not documented</span></div>
+      </div>
+    </div>
+
+    <section aria-labelledby="problem">
+      <h2 id="problem">Move-in day is when your record matters most</h2>
+      <p>At move-out, the hard question is often: <em>was it like that when you moved in?</em> Photos scattered across a camera roll and chat threads are hard to find and hard to explain years later. Legal-aid and university housing guides commonly tell renters to document condition at move-in. Move-In Record makes that guided and organized.</p>
+    </section>
+
+    <section aria-labelledby="how">
+      <h2 id="how">How it works</h2>
+      <ol class="steps">
+        <li><b>Add your place</b><br>Name it; the address is optional.</li>
+        <li><b>Walk each room</b><br>Short prompts: walls, floor, windows, appliances.</li>
+        <li><b>Note issues</b><br>Describe damage and mark the spot on the photo.</li>
+        <li><b>Get the report</b><br>A PDF with every room, photo, note and date.</li>
+        <li><b>Send &amp; keep</b><br>Share with your landlord and export a backup.</li>
+      </ol>
+    </section>
+
+    <section aria-labelledby="features">
+      <h2 id="features">What you get</h2>
+      <div class="grid">
+        <div class="card"><h3>Guided, room by room</h3><p>10 room types with simple photo prompts. Add your own rooms and prompts, or mark items "not in this unit".</p></div>
+        <div class="card"><h3>Issues where they belong</h3><p>Record the type and how noticeable each issue is, link it to a photo, and place a numbered marker.</p></div>
+        <div class="card"><h3>A report you can send</h3><p>A clean PDF you can email from your phone. The app notes the date you marked it as sent.</p></div>
+        <div class="card"><h3>Originals kept unchanged</h3><p>Each original file is stored as received, with a SHA-256 fingerprint you can check with standard tools.</p></div>
+        <div class="card"><h3>A backup you control</h3><p>Export an evidence package (.zip) with your originals, the report and a list of fingerprints.</p></div>
+        <div class="card"><h3>Move-out, side by side</h3><p>Repeat the same walkthrough when you leave and compare each room with your move-in photos.</p></div>
+      </div>
+    </section>
+
+    <section aria-labelledby="privacy">
+      <h2 id="privacy">Private by design</h2>
+      <p>No account, no ads, no analytics. Everything is stored in the app on your phone and goes nowhere unless you share or export it. Uninstalling the app deletes its data.</p>
+    </section>
+
+    <section aria-labelledby="limits">
+      <h2 id="limits">Honest about what it can and can't show</h2>
+      <div class="limits">
+        <p>Dates come from your phone's clock at the moment the app saved each file. A fingerprint shows a stored file hasn't changed since. It doesn't prove when a photo was taken or who took it. Move-In Record isn't legal advice and can't guarantee any outcome. Rules and deadlines vary, so check your lease and local rules.</p>
+      </div>
+    </section>
+
+    <section aria-labelledby="faq">
+      <h2 id="faq">FAQ</h2>
+      <details><summary>Is it really free?</summary><p>Yes. The current version has no purchases and no ads.</p></details>
+      <details><summary>Do I need my landlord's permission or participation?</summary><p>No. You create your own record. Sending it to your landlord gives both of you the same information early.</p></details>
+      <details><summary>Where are my photos stored?</summary><p>In the app's private storage on your phone. Use "Export evidence package" to keep a copy somewhere safe, such as your email or cloud storage.</p></details>
+      <details><summary>Will this get my deposit back?</summary><p>No app can promise that. It helps you keep an organized, dated record and share it. How it's used is up to you, your landlord, and the rules where you live.</p></details>
+      <details><summary>I already moved in. Is it too late?</summary><p>You can still record the current condition, or import photos you took earlier (they're labeled as imported). You can also use it at move-out.</p></details>
+      <details><summary>Android or iPhone?</summary><p>Both.</p></details>
+    </section>
+
+    <section id="availability" aria-labelledby="avail">
+      <h2 id="avail">Availability</h2>
+      <p id="availability-text">Move-In Record is in preparation for a first beta. Store links will appear here.</p>
+    </section>
+  </main>
+
+  <footer>
+    <p>Move-In Record is a working name. Not a law firm; no legal advice. <a href="privacy.html">Privacy</a></p>
+  </footer>
+</div>
+<script>
+  // Set these when store listings exist. Until then the CTA scrolls to the
+  // availability note instead of a dead link.
+  const STORE_LINKS = { ios: "", android: "" };
+  const links = Object.entries(STORE_LINKS).filter(([, url]) => url);
+  if (links.length) {
+    const p = document.getElementById("availability-text");
+    p.innerHTML = links.map(([k, url]) =>
+      `<a class="cta" href="${url}">${k === "ios" ? "App Store" : "Google Play"}</a>`).join(" ");
+  }
+</script>
+</body>
+</html>

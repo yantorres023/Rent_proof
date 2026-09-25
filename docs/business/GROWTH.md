@@ -76,3 +76,14 @@ Every article must link to primary sources, carry "information, not legal advice
 - **HYPOTHESIS.** Apartment-tour, "first apartment" and moving-day creators could show a guided move-in walkthrough as practical content. The free core makes this an honest recommendation (nothing to buy to follow along).
 - **Test later** (requires outreach, not done): unpaid or affiliate-only partnerships with 3–5 micro-creators around the Aug–Sep lease season. Track via store campaign links.
 - **Guardrails.** Creators may not claim guaranteed deposits or "court-proof" evidence. FTC disclosure is required for any compensation.
+
+---
+
+## Lead amendments (2026-09-25)
+
+- **Name:** the provisional public name is "Move-In Record" (DECISIONS D-004). The final name needs clearance.
+- **Landing copy (§5) was adjusted for the V1 that actually exists** (see `/landing/index.html`):
+  - "Your state's timeline … plus reminders" is removed (D-006: not verified, not built). It is replaced by a generic "check your lease for deadlines".
+  - "Pay once per move" is removed. V1 is free (D-005).
+  - "One tap emails the PDF" becomes "Send it from your phone's share sheet (email, messages)", which is how V1 works.
+- **State-specific SEO pages (§1):** each page must cite and quote the **primary statute text**, checked by a person, before publishing. Research agents could not fetch statute pages in this session, so every deadline figure is `VERIFY_PRIMARY_TEXT`.

@@ -18,6 +18,28 @@ class StoragePaths {
   final String exportRoot;
 
   String get evidenceRoot => p.join(root, 'evidence');
+
+  /// App cache directory (parent of [exportRoot]). Camera/picker plugins
+  /// write temporary copies here on Android.
+  String get cacheRoot => p.dirname(exportRoot);
+
+  /// Deletes a picker/camera temporary file once the app has stored its own
+  /// copy, so evidence is not duplicated in the cache. Only files inside the
+  /// app cache (and outside [exportRoot]) are touched.
+  Future<void> discardPickerTemp(String path) async {
+    final normalized = p.normalize(path);
+    if (!p.isWithin(cacheRoot, normalized) ||
+        p.isWithin(exportRoot, normalized)) {
+      return;
+    }
+    final f = File(normalized);
+    try {
+      if (f.existsSync()) await f.delete();
+    } on FileSystemException {
+      // Best effort; the OS clears the cache eventually.
+    }
+  }
+
   String get reportsRoot => p.join(root, 'reports');
 
   static Future<StoragePaths> platform() async {

@@ -288,6 +288,9 @@ class AppDatabase extends _$AppDatabase {
     },
     beforeOpen: (details) async {
       await customStatement('PRAGMA foreign_keys = ON');
+      // Overwrite deleted content so removed notes/metadata do not linger
+      // in free database pages.
+      await customStatement('PRAGMA secure_delete = ON');
     },
   );
 

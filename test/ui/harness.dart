@@ -91,6 +91,7 @@ class UiEnv {
     mediaPickerProvider.overrideWithValue(picker),
     shareServiceProvider.overrideWithValue(share),
     mediaProcessorProvider.overrideWithValue(processMedia),
+    platformDecoderProvider.overrideWithValue(null),
     pdfRunnerProvider.overrideWithValue(
       (input, fonts) => buildReportPdf(input, fonts),
     ),

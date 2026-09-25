@@ -12,17 +12,6 @@ class SystemClock implements Clock {
   DateTime now() => DateTime.now();
 }
 
-class FixedClock implements Clock {
-  FixedClock(this.value);
-
-  DateTime value;
-
-  @override
-  DateTime now() => value;
-
-  void advance(Duration d) => value = value.add(d);
-}
-
 /// Random (v4) identifiers. Never derived from user input.
 class IdGenerator {
   const IdGenerator();

@@ -59,6 +59,7 @@ Future<int> runCapture(
           source: m.source,
         );
         stored++;
+        await ref.read(storagePathsProvider).discardPickerTemp(m.path);
       } on Object catch (e) {
         firstError ??= e;
       }

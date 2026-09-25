@@ -5,6 +5,7 @@ import 'package:drift/drift.dart';
 
 import '../services/clock.dart';
 import '../services/media_processing.dart';
+import '../services/platform_preview.dart';
 import '../services/safe_paths.dart';
 import '../services/storage_paths.dart';
 import 'database.dart';
@@ -60,6 +61,7 @@ class EvidenceRepository {
     this._clock = const SystemClock(),
     this._ids = const IdGenerator(),
     this._processor = processMediaInIsolate,
+    this._platformDecoder,
   });
 
   final AppDatabase _db;
@@ -67,6 +69,9 @@ class EvidenceRepository {
   final Clock _clock;
   final IdGenerator _ids;
   final MediaProcessor _processor;
+
+  /// Fallback for photo formats the Dart decoder cannot read (e.g. HEIC).
+  final PlatformDecoder? _platformDecoder;
 
   Future<Room> _editableRoom(String roomId) async {
     final room = await (_db.select(
@@ -115,7 +120,7 @@ class EvidenceRepository {
     final previewAbs = _paths.evidenceFile(previewRel);
     await Directory(File(previewAbs).parent.path).create(recursive: true);
 
-    final result = await _processor(
+    var result = await _processor(
       MediaProcessRequest(
         sourcePath: sourcePath,
         originalDestPath: _paths.evidenceFile(originalRel),
@@ -124,6 +129,14 @@ class EvidenceRepository {
         isPhoto: isPhoto,
       ),
     );
+    if (isPhoto && !result.previewWritten && _platformDecoder != null) {
+      result = await _derivePreviewWithPlatform(
+        result,
+        originalRel,
+        previewRel,
+        thumbRel,
+      );
+    }
 
     final media = MediaEvidenceCompanion.insert(
       id: id,
@@ -178,6 +191,35 @@ class EvidenceRepository {
       rethrow;
     }
     return getMedia(id);
+  }
+
+  Future<MediaProcessResult> _derivePreviewWithPlatform(
+    MediaProcessResult result,
+    String originalRel,
+    String previewRel,
+    String thumbRel,
+  ) async {
+    final decoded = await _platformDecoder!(_paths.evidenceFile(originalRel));
+    if (decoded == null) return result;
+    final request = DerivedFromRgbaRequest(
+      image: decoded,
+      previewDestPath: _paths.evidenceFile(previewRel),
+      thumbnailDestPath: _paths.evidenceFile(thumbRel),
+    );
+    final ok = await Isolate.run(() => writeDerivedFromRgba(request));
+    if (!ok) return result;
+    return MediaProcessResult(
+      sha256: result.sha256,
+      byteSize: result.byteSize,
+      previewWritten: true,
+      thumbnailWritten: true,
+      width: decoded.width,
+      height: decoded.height,
+      exifDateTimeOriginal: result.exifDateTimeOriginal,
+      exifMake: result.exifMake,
+      exifModel: result.exifModel,
+      hasGps: result.hasGps,
+    );
   }
 
   Future<MediaItem> getMedia(String id) => (_db.select(

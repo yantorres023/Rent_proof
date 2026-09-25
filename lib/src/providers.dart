@@ -10,6 +10,7 @@ import 'report/pdf_report_builder.dart';
 import 'report/report_repository.dart';
 import 'services/clock.dart';
 import 'services/media_picker.dart';
+import 'services/platform_preview.dart';
 import 'services/share_service.dart';
 import 'services/storage_paths.dart';
 
@@ -36,6 +37,10 @@ final shareServiceProvider = Provider<ShareService>(
 
 final mediaProcessorProvider = Provider<MediaProcessor>(
   (ref) => processMediaInIsolate,
+);
+
+final platformDecoderProvider = Provider<PlatformDecoder?>(
+  (ref) => decodeWithPlatform,
 );
 
 final pdfRunnerProvider = Provider<PdfRunner>((ref) => buildPdfInIsolate);
@@ -74,6 +79,7 @@ final evidenceRepositoryProvider = Provider(
     ref.watch(storagePathsProvider),
     clock: ref.watch(clockProvider),
     processor: ref.watch(mediaProcessorProvider),
+    platformDecoder: ref.watch(platformDecoderProvider),
   ),
 );
 

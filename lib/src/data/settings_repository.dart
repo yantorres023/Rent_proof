@@ -95,6 +95,8 @@ class SettingsRepository {
         await _db.delete(table).go();
       }
     });
+    // Rebuild the file so no deleted content remains in free pages.
+    await _db.customStatement('VACUUM');
     await _paths.deleteAll();
   }
 }

@@ -124,6 +124,12 @@ class ReportRepository {
     if (f.existsSync()) await f.delete();
   }
 
+  /// Records that the user exported (shared or saved) the evidence package.
+  Future<void> markPackageExported(String inspectionId) async {
+    await (_db.update(_db.inspections)..where((t) => t.id.equals(inspectionId)))
+        .write(InspectionsCompanion(lastPackageExportAt: Value(_clock.now())));
+  }
+
   /// Copies a stored report into the export directory under a readable name.
   Future<File> exportReport(Report report) async {
     final snap = await _loader.load(report.inspectionId);

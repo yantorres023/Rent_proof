@@ -213,6 +213,14 @@ class _InspectionCard extends StatelessWidget {
               const SizedBox(height: 4),
               Text('Started ${dateTimeFormat.format(i.startedAt)}'),
               const SizedBox(height: 4),
+              if (completed && i.lastPackageExportAt == null) ...[
+                StatusLabel(
+                  icon: Icons.warning_amber_outlined,
+                  label: 'No backup exported yet',
+                  color: StatusColors.warning(scheme),
+                ),
+                const SizedBox(height: 4),
+              ],
               Text(
                 '${summary.completedRoomCount} of ${summary.roomCount} rooms '
                 'done · ${count(summary.mediaCount, 'photo/video', 'photos/videos')} · '

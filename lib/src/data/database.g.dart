@@ -1354,6 +1354,17 @@ class $InspectionsTable extends Inspections
     type: DriftSqlType.dateTime,
     requiredDuringInsert: false,
   );
+  static const VerificationMeta _lastPackageExportAtMeta =
+      const VerificationMeta('lastPackageExportAt');
+  @override
+  late final GeneratedColumn<DateTime> lastPackageExportAt =
+      GeneratedColumn<DateTime>(
+        'last_package_export_at',
+        aliasedName,
+        true,
+        type: DriftSqlType.dateTime,
+        requiredDuringInsert: false,
+      );
   @override
   List<GeneratedColumn> get $columns => [
     id,
@@ -1364,6 +1375,7 @@ class $InspectionsTable extends Inspections
     notes,
     startedAt,
     completedAt,
+    lastPackageExportAt,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -1422,6 +1434,15 @@ class $InspectionsTable extends Inspections
         ),
       );
     }
+    if (data.containsKey('last_package_export_at')) {
+      context.handle(
+        _lastPackageExportAtMeta,
+        lastPackageExportAt.isAcceptableOrUnknown(
+          data['last_package_export_at']!,
+          _lastPackageExportAtMeta,
+        ),
+      );
+    }
     return context;
   }
 
@@ -1467,6 +1488,10 @@ class $InspectionsTable extends Inspections
         DriftSqlType.dateTime,
         data['${effectivePrefix}completed_at'],
       ),
+      lastPackageExportAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}last_package_export_at'],
+      ),
     );
   }
 
@@ -1492,6 +1517,9 @@ class Inspection extends DataClass implements Insertable<Inspection> {
   final String notes;
   final DateTime startedAt;
   final DateTime? completedAt;
+
+  /// Last time the user exported the evidence package (backup reminder).
+  final DateTime? lastPackageExportAt;
   const Inspection({
     required this.id,
     required this.propertyId,
@@ -1501,6 +1529,7 @@ class Inspection extends DataClass implements Insertable<Inspection> {
     required this.notes,
     required this.startedAt,
     this.completedAt,
+    this.lastPackageExportAt,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -1525,6 +1554,9 @@ class Inspection extends DataClass implements Insertable<Inspection> {
     if (!nullToAbsent || completedAt != null) {
       map['completed_at'] = Variable<DateTime>(completedAt);
     }
+    if (!nullToAbsent || lastPackageExportAt != null) {
+      map['last_package_export_at'] = Variable<DateTime>(lastPackageExportAt);
+    }
     return map;
   }
 
@@ -1542,6 +1574,9 @@ class Inspection extends DataClass implements Insertable<Inspection> {
       completedAt: completedAt == null && nullToAbsent
           ? const Value.absent()
           : Value(completedAt),
+      lastPackageExportAt: lastPackageExportAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(lastPackageExportAt),
     );
   }
 
@@ -1565,6 +1600,9 @@ class Inspection extends DataClass implements Insertable<Inspection> {
       notes: serializer.fromJson<String>(json['notes']),
       startedAt: serializer.fromJson<DateTime>(json['startedAt']),
       completedAt: serializer.fromJson<DateTime?>(json['completedAt']),
+      lastPackageExportAt: serializer.fromJson<DateTime?>(
+        json['lastPackageExportAt'],
+      ),
     );
   }
   @override
@@ -1583,6 +1621,7 @@ class Inspection extends DataClass implements Insertable<Inspection> {
       'notes': serializer.toJson<String>(notes),
       'startedAt': serializer.toJson<DateTime>(startedAt),
       'completedAt': serializer.toJson<DateTime?>(completedAt),
+      'lastPackageExportAt': serializer.toJson<DateTime?>(lastPackageExportAt),
     };
   }
 
@@ -1595,6 +1634,7 @@ class Inspection extends DataClass implements Insertable<Inspection> {
     String? notes,
     DateTime? startedAt,
     Value<DateTime?> completedAt = const Value.absent(),
+    Value<DateTime?> lastPackageExportAt = const Value.absent(),
   }) => Inspection(
     id: id ?? this.id,
     propertyId: propertyId ?? this.propertyId,
@@ -1606,6 +1646,9 @@ class Inspection extends DataClass implements Insertable<Inspection> {
     notes: notes ?? this.notes,
     startedAt: startedAt ?? this.startedAt,
     completedAt: completedAt.present ? completedAt.value : this.completedAt,
+    lastPackageExportAt: lastPackageExportAt.present
+        ? lastPackageExportAt.value
+        : this.lastPackageExportAt,
   );
   Inspection copyWithCompanion(InspectionsCompanion data) {
     return Inspection(
@@ -1623,6 +1666,9 @@ class Inspection extends DataClass implements Insertable<Inspection> {
       completedAt: data.completedAt.present
           ? data.completedAt.value
           : this.completedAt,
+      lastPackageExportAt: data.lastPackageExportAt.present
+          ? data.lastPackageExportAt.value
+          : this.lastPackageExportAt,
     );
   }
 
@@ -1636,7 +1682,8 @@ class Inspection extends DataClass implements Insertable<Inspection> {
           ..write('baselineInspectionId: $baselineInspectionId, ')
           ..write('notes: $notes, ')
           ..write('startedAt: $startedAt, ')
-          ..write('completedAt: $completedAt')
+          ..write('completedAt: $completedAt, ')
+          ..write('lastPackageExportAt: $lastPackageExportAt')
           ..write(')'))
         .toString();
   }
@@ -1651,6 +1698,7 @@ class Inspection extends DataClass implements Insertable<Inspection> {
     notes,
     startedAt,
     completedAt,
+    lastPackageExportAt,
   );
   @override
   bool operator ==(Object other) =>
@@ -1663,7 +1711,8 @@ class Inspection extends DataClass implements Insertable<Inspection> {
           other.baselineInspectionId == this.baselineInspectionId &&
           other.notes == this.notes &&
           other.startedAt == this.startedAt &&
-          other.completedAt == this.completedAt);
+          other.completedAt == this.completedAt &&
+          other.lastPackageExportAt == this.lastPackageExportAt);
 }
 
 class InspectionsCompanion extends UpdateCompanion<Inspection> {
@@ -1675,6 +1724,7 @@ class InspectionsCompanion extends UpdateCompanion<Inspection> {
   final Value<String> notes;
   final Value<DateTime> startedAt;
   final Value<DateTime?> completedAt;
+  final Value<DateTime?> lastPackageExportAt;
   final Value<int> rowid;
   const InspectionsCompanion({
     this.id = const Value.absent(),
@@ -1685,6 +1735,7 @@ class InspectionsCompanion extends UpdateCompanion<Inspection> {
     this.notes = const Value.absent(),
     this.startedAt = const Value.absent(),
     this.completedAt = const Value.absent(),
+    this.lastPackageExportAt = const Value.absent(),
     this.rowid = const Value.absent(),
   });
   InspectionsCompanion.insert({
@@ -1696,6 +1747,7 @@ class InspectionsCompanion extends UpdateCompanion<Inspection> {
     this.notes = const Value.absent(),
     required DateTime startedAt,
     this.completedAt = const Value.absent(),
+    this.lastPackageExportAt = const Value.absent(),
     this.rowid = const Value.absent(),
   }) : id = Value(id),
        propertyId = Value(propertyId),
@@ -1711,6 +1763,7 @@ class InspectionsCompanion extends UpdateCompanion<Inspection> {
     Expression<String>? notes,
     Expression<DateTime>? startedAt,
     Expression<DateTime>? completedAt,
+    Expression<DateTime>? lastPackageExportAt,
     Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
@@ -1723,6 +1776,8 @@ class InspectionsCompanion extends UpdateCompanion<Inspection> {
       if (notes != null) 'notes': notes,
       if (startedAt != null) 'started_at': startedAt,
       if (completedAt != null) 'completed_at': completedAt,
+      if (lastPackageExportAt != null)
+        'last_package_export_at': lastPackageExportAt,
       if (rowid != null) 'rowid': rowid,
     });
   }
@@ -1736,6 +1791,7 @@ class InspectionsCompanion extends UpdateCompanion<Inspection> {
     Value<String>? notes,
     Value<DateTime>? startedAt,
     Value<DateTime?>? completedAt,
+    Value<DateTime?>? lastPackageExportAt,
     Value<int>? rowid,
   }) {
     return InspectionsCompanion(
@@ -1747,6 +1803,7 @@ class InspectionsCompanion extends UpdateCompanion<Inspection> {
       notes: notes ?? this.notes,
       startedAt: startedAt ?? this.startedAt,
       completedAt: completedAt ?? this.completedAt,
+      lastPackageExportAt: lastPackageExportAt ?? this.lastPackageExportAt,
       rowid: rowid ?? this.rowid,
     );
   }
@@ -1784,6 +1841,11 @@ class InspectionsCompanion extends UpdateCompanion<Inspection> {
     if (completedAt.present) {
       map['completed_at'] = Variable<DateTime>(completedAt.value);
     }
+    if (lastPackageExportAt.present) {
+      map['last_package_export_at'] = Variable<DateTime>(
+        lastPackageExportAt.value,
+      );
+    }
     if (rowid.present) {
       map['rowid'] = Variable<int>(rowid.value);
     }
@@ -1801,6 +1863,7 @@ class InspectionsCompanion extends UpdateCompanion<Inspection> {
           ..write('notes: $notes, ')
           ..write('startedAt: $startedAt, ')
           ..write('completedAt: $completedAt, ')
+          ..write('lastPackageExportAt: $lastPackageExportAt, ')
           ..write('rowid: $rowid')
           ..write(')'))
         .toString();
@@ -7402,6 +7465,7 @@ typedef $$InspectionsTableCreateCompanionBuilder =
       Value<String> notes,
       required DateTime startedAt,
       Value<DateTime?> completedAt,
+      Value<DateTime?> lastPackageExportAt,
       Value<int> rowid,
     });
 typedef $$InspectionsTableUpdateCompanionBuilder =
@@ -7414,6 +7478,7 @@ typedef $$InspectionsTableUpdateCompanionBuilder =
       Value<String> notes,
       Value<DateTime> startedAt,
       Value<DateTime?> completedAt,
+      Value<DateTime?> lastPackageExportAt,
       Value<int> rowid,
     });
 
@@ -7535,6 +7600,11 @@ class $$InspectionsTableFilterComposer
 
   ColumnFilters<DateTime> get completedAt => $composableBuilder(
     column: $table.completedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get lastPackageExportAt => $composableBuilder(
+    column: $table.lastPackageExportAt,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -7674,6 +7744,11 @@ class $$InspectionsTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<DateTime> get lastPackageExportAt => $composableBuilder(
+    column: $table.lastPackageExportAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   $$PropertiesTableOrderingComposer get propertyId {
     final $$PropertiesTableOrderingComposer composer = $composerBuilder(
       composer: this,
@@ -7747,6 +7822,11 @@ class $$InspectionsTableAnnotationComposer
 
   GeneratedColumn<DateTime> get completedAt => $composableBuilder(
     column: $table.completedAt,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get lastPackageExportAt => $composableBuilder(
+    column: $table.lastPackageExportAt,
     builder: (column) => column,
   );
 
@@ -7888,6 +7968,7 @@ class $$InspectionsTableTableManager
                 Value<String> notes = const Value.absent(),
                 Value<DateTime> startedAt = const Value.absent(),
                 Value<DateTime?> completedAt = const Value.absent(),
+                Value<DateTime?> lastPackageExportAt = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => InspectionsCompanion(
                 id: id,
@@ -7898,6 +7979,7 @@ class $$InspectionsTableTableManager
                 notes: notes,
                 startedAt: startedAt,
                 completedAt: completedAt,
+                lastPackageExportAt: lastPackageExportAt,
                 rowid: rowid,
               ),
           createCompanionCallback:
@@ -7910,6 +7992,7 @@ class $$InspectionsTableTableManager
                 Value<String> notes = const Value.absent(),
                 required DateTime startedAt,
                 Value<DateTime?> completedAt = const Value.absent(),
+                Value<DateTime?> lastPackageExportAt = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => InspectionsCompanion.insert(
                 id: id,
@@ -7920,6 +8003,7 @@ class $$InspectionsTableTableManager
                 notes: notes,
                 startedAt: startedAt,
                 completedAt: completedAt,
+                lastPackageExportAt: lastPackageExportAt,
                 rowid: rowid,
               ),
           withReferenceMapper: (p0) => p0

@@ -107,12 +107,18 @@ class _ReportScreenState extends ConsumerState<ReportScreen> {
       () => repo.exportEvidencePackage(widget.inspectionId, report: latest),
     );
     if (zip == null || !mounted) return;
-    await _run(
+    final outcome = await _run(
       'Opening share…',
       () => ref.read(shareServiceProvider).shareFiles([
         zip.path,
       ], subject: 'Evidence package'),
     );
+    if (outcome != null && outcome != ShareOutcome.dismissed && mounted) {
+      await runGuarded(
+        context,
+        () => repo.markPackageExported(widget.inspectionId),
+      );
+    }
   }
 
   Future<void> _delete(Report report) async {
@@ -206,6 +212,19 @@ class _ReportScreenState extends ConsumerState<ReportScreen> {
                 'email or cloud storage, so it survives a lost or replaced '
                 'phone. Original photos may include location data written '
                 'by your camera.',
+              ),
+              const SizedBox(height: 8),
+              StatusLabel(
+                icon: inspection?.lastPackageExportAt != null
+                    ? Icons.cloud_done_outlined
+                    : Icons.warning_amber_outlined,
+                label: inspection?.lastPackageExportAt != null
+                    ? 'Backup exported on '
+                          '${dateFormat.format(inspection!.lastPackageExportAt!)}'
+                    : 'No backup exported yet',
+                color: inspection?.lastPackageExportAt != null
+                    ? StatusColors.done(theme.colorScheme)
+                    : StatusColors.warning(theme.colorScheme),
               ),
               const SizedBox(height: 8),
               OutlinedButton.icon(

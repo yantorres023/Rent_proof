@@ -200,9 +200,11 @@ void main() {
     // Let the confirmation snackbar disappear first.
     await tester.pump(const Duration(seconds: 5));
     await tester.pumpAndSettle();
+    expect(find.text('No backup exported yet'), findsOneWidget);
     await tapAndSettle(tester, find.text('Export evidence package'));
     await settle(tester);
     expect(ui.share.calls.last.paths.single, endsWith('_evidence.zip'));
+    expect(find.textContaining('Backup exported on'), findsOneWidget);
     await disposeUi(tester, ui);
   });
 

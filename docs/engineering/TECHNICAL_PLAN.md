@@ -48,7 +48,7 @@ Imperative `Navigator` with `MaterialPageRoute`. The app is a shallow, linear st
 | user_profiles | id=1, display_name, email | – |
 | app_settings | key, value | – |
 | properties | id, nickname, address…, landlord_name | 1:N inspections (cascade) |
-| inspections | id, property_id, type, status, baseline_inspection_id, started_at, completed_at | 1:N rooms (cascade); baseline → inspections (set null) |
+| inspections | id, property_id, type, status, baseline_inspection_id, started_at, completed_at, last_package_export_at | 1:N rooms (cascade); baseline → inspections (set null) |
 | rooms | id, inspection_id, name, template_key, position, status, baseline_room_id | 1:N checklist_items, media, issues (cascade) |
 | checklist_items | id, room_id, label, position, not_applicable | media.checklist_item_id (set null) |
 | media_evidence | id, room_id, kind, source, original_path, preview_path, thumbnail_path, sha256, byte_size, recorded_at, exif_*, original_has_gps, width, height, caption | 1:N evidence_hashes, annotations (cascade); issues.media_id (set null) |

@@ -42,3 +42,32 @@ Format: DATE / DECISION / OPTIONS CONSIDERED / RATIONALE / CONSEQUENCES
 - DECISION: No state-by-state legal deadlines or reminders in V1.
 - RATIONALE: The statute details were not verified against primary text, and wrong deadlines could harm users and read as legal advice.
 - CONSEQUENCES: V1 shows generic guidance only. Recorded in BACKLOG with a verification gate.
+
+### D-007: English-only strings inline; localization-ready infrastructure
+- DATE: 2026-09-25
+- DECISION: The UI copy is inline English. `flutter_localizations` and locale-aware `intl` dates are wired up. The legal/limitations copy is centralized in `reportLimitations`.
+- OPTIONS CONSIDERED: full ARB/gen-l10n now; inline strings with a documented migration.
+- RATIONALE: V1 targets US English (D-003). Full ARB extraction costs a lot and adds no validation value yet.
+- CONSEQUENCES: BACKLOG B-09. Extract to ARB before adding the first additional locale.
+
+### D-008: Android cloud backup off; device transfer on; iOS backups allowed
+- DATE: 2026-09-25
+- DECISION: `allowBackup=false` plus `dataExtractionRules` excluding cloud backup. Device-to-device transfer is allowed. iOS app data stays in device backups.
+- OPTIONS CONSIDERED: default Auto Backup; full exclusion; custom include rules.
+- RATIONALE: Android Auto Backup caps at 25 MB. A partial restore could bring back database rows without their evidence files, which would show as "missing" and undermine trust. D2D and iOS backups copy everything together.
+- CONSEQUENCES: The evidence package export is the primary backup. The UI shows backup status (FINAL_RED_TEAM #3).
+
+### D-009: Riverpod 3 (no codegen), drift, imperative Navigator
+- DATE: 2026-09-25
+- OPTIONS CONSIDERED: Provider/ChangeNotifier, BLoC, Riverpod codegen; sqflite with raw SQL, Isar, Hive; go_router.
+- RATIONALE:
+  - drift: typed schema, migrations with schema verification, and reactive queries.
+  - Riverpod: parameterized stream providers and easy overrides in tests.
+  - Navigator: the stack is shallow and there are no deep links.
+- CONSEQUENCES: build_runner is needed for drift, and CI checks that generated code is current.
+
+### D-010: Platform-codec preview fallback
+- DATE: 2026-09-25
+- DECISION: When the pure-Dart decoder can't read a photo (e.g. HEIC), decode it with the platform's codecs via `dart:ui` and derive previews in an isolate.
+- RATIONALE: iPhones and many Androids shoot HEIC. Without this, those photos would show "preview unavailable" in reports.
+- CONSEQUENCES: Unit-tested with an injected decoder. The real HEIC path is unverified on devices (V-11).

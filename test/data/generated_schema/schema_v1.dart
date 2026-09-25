@@ -342,6 +342,15 @@ class Inspections extends Table with TableInfo {
     requiredDuringInsert: false,
     $customConstraints: 'NULL',
   );
+  late final GeneratedColumn<String> lastPackageExportAt =
+      GeneratedColumn<String>(
+        'last_package_export_at',
+        aliasedName,
+        true,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+        $customConstraints: 'NULL',
+      );
   @override
   List<GeneratedColumn> get $columns => [
     id,
@@ -352,6 +361,7 @@ class Inspections extends Table with TableInfo {
     notes,
     startedAt,
     completedAt,
+    lastPackageExportAt,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;

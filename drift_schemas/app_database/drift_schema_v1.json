@@ -384,6 +384,16 @@
             "default_dart": null,
             "default_client_dart": null,
             "dsl_features": []
+          },
+          {
+            "name": "last_package_export_at",
+            "getter_name": "lastPackageExportAt",
+            "moor_type": "dateTime",
+            "nullable": true,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
           }
         ],
         "is_virtual": false,
@@ -1579,7 +1589,7 @@
       "sql": [
         {
           "dialect": "sqlite",
-          "sql": "CREATE TABLE IF NOT EXISTS \"inspections\" (\"id\" TEXT NOT NULL, \"property_id\" TEXT NOT NULL REFERENCES properties (id) ON DELETE CASCADE, \"type\" TEXT NOT NULL, \"status\" TEXT NOT NULL, \"baseline_inspection_id\" TEXT NULL REFERENCES inspections (id) ON DELETE SET NULL, \"notes\" TEXT NOT NULL DEFAULT '', \"started_at\" TEXT NOT NULL, \"completed_at\" TEXT NULL, PRIMARY KEY (\"id\"));"
+          "sql": "CREATE TABLE IF NOT EXISTS \"inspections\" (\"id\" TEXT NOT NULL, \"property_id\" TEXT NOT NULL REFERENCES properties (id) ON DELETE CASCADE, \"type\" TEXT NOT NULL, \"status\" TEXT NOT NULL, \"baseline_inspection_id\" TEXT NULL REFERENCES inspections (id) ON DELETE SET NULL, \"notes\" TEXT NOT NULL DEFAULT '', \"started_at\" TEXT NOT NULL, \"completed_at\" TEXT NULL, \"last_package_export_at\" TEXT NULL, PRIMARY KEY (\"id\"));"
         }
       ]
     },

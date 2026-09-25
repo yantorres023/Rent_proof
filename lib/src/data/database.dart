@@ -63,6 +63,9 @@ class Inspections extends Table {
   DateTimeColumn get startedAt => dateTime()();
   DateTimeColumn get completedAt => dateTime().nullable()();
 
+  /// Last time the user exported the evidence package (backup reminder).
+  DateTimeColumn get lastPackageExportAt => dateTime().nullable()();
+
   @override
   Set<Column> get primaryKey => {id};
 }

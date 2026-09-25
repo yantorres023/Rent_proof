@@ -1,0 +1,85 @@
+name: CI
+
+on:
+  push:
+    branches: [main, "claude/**"]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  FLUTTER_VERSION: "3.47.5"
+
+jobs:
+  checks:
+    name: Format, analyze, test
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          cache: true
+      - run: flutter pub get
+      - name: Generated code is up to date
+        run: |
+          dart run build_runner build
+          git diff --exit-code -- lib/src/data/database.g.dart
+      - name: Format
+        run: dart format --output=none --set-exit-if-changed lib test
+      - name: Analyze
+        run: flutter analyze
+      - name: Test (unit, widget, golden)
+        run: flutter test
+      - name: Upload golden failures
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: golden-failures
+          path: test/**/failures/
+          if-no-files-found: ignore
+
+  android:
+    name: Android build
+    needs: checks
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          cache: true
+      - run: flutter pub get
+      # No signing secrets in CI: release builds use the debug key and are
+      # for verification only. Never upload these artifacts to Google Play.
+      - name: Build APK (release, debug-signed)
+        run: flutter build apk --release
+      - name: Build App Bundle (release, debug-signed)
+        run: flutter build appbundle --release
+      - name: Check requested permissions
+        run: |
+          AAPT2=$(ls -d "$ANDROID_HOME"/build-tools/* | sort -V | tail -1)/aapt2
+          "$AAPT2" dump permissions build/app/outputs/flutter-apk/app-release.apk | tee permissions.txt
+          for p in INTERNET CAMERA READ_EXTERNAL_STORAGE READ_MEDIA_IMAGES READ_MEDIA_VIDEO ACCESS_FINE_LOCATION RECORD_AUDIO; do
+            if grep -q "android.permission.$p'" permissions.txt; then
+              echo "::error::Unexpected permission $p in release APK"; exit 1
+            fi
+          done
+      - uses: actions/upload-artifact@v4
+        with:
+          name: android-release-unsigned-for-testing
+          path: |
+            build/app/outputs/flutter-apk/app-release.apk
+            build/app/outputs/bundle/release/app-release.aab
+            permissions.txt

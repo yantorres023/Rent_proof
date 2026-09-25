@@ -118,9 +118,10 @@ class SettingsScreen extends ConsumerWidget {
               'No account, no analytics, no ads, no crash reporting. Your '
               'places, photos, notes and reports are stored in this app\'s '
               'private storage on this phone and are sent nowhere unless you '
-              'share or export them. Your phone\'s own backup service may '
-              'include app data depending on your settings. Uninstalling the '
-              'app deletes everything.',
+              'share or export them. On iPhone, your device backup (iCloud '
+              'or computer) may include app data. On Android, app data is '
+              'not included in cloud backup. Export the evidence package to '
+              'keep your own copy. Uninstalling the app deletes everything.',
             ),
           ),
           const SizedBox(height: 8),

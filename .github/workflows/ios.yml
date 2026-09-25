@@ -1,0 +1,41 @@
+name: iOS
+
+on:
+  push:
+    branches: [main, "claude/**"]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ios-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  FLUTTER_VERSION: "3.47.5"
+
+jobs:
+  ios:
+    name: Test and build (no codesign)
+    runs-on: macos-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          cache: true
+      - run: flutter pub get
+      # Golden images are rendered on Linux; font rasterization differs on macOS.
+      - name: Test
+        run: flutter test --exclude-tags golden
+      # Signing identity and provisioning profiles are owner-only secrets
+      # (BLOCKED_BY_CREDENTIALS). This proves the project compiles for device.
+      - name: Build iOS (release, no codesign)
+        run: flutter build ios --release --no-codesign
+      - name: Package Runner.app
+        run: cd build/ios/iphoneos && zip -qr Runner-unsigned.zip Runner.app
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ios-release-unsigned
+          path: build/ios/iphoneos/Runner-unsigned.zip

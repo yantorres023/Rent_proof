@@ -1,0 +1,10 @@
+targets:
+  $default:
+    builders:
+      drift_dev:
+        options:
+          # ISO-8601 text with timezone offset keeps millisecond precision and
+          # is human-readable in exported databases.
+          store_date_time_values_as_text: true
+          databases:
+            app_database: lib/src/data/database.dart

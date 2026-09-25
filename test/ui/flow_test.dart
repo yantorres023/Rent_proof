@@ -188,7 +188,10 @@ void main() {
     expect(find.text('Not sent to your landlord yet'), findsOneWidget);
 
     await tapAndSettle(tester, find.text('Send to landlord'));
-    expect(ui.share.calls.single.subject, startsWith('Move-in condition report'));
+    expect(
+      ui.share.calls.single.subject,
+      startsWith('Move-in condition report'),
+    );
     expect(ui.share.calls.single.text, contains('SHA-256'));
     expect(File(ui.share.calls.single.paths.single).existsSync(), isTrue);
     await tapAndSettle(tester, find.text('Yes, I sent it'));

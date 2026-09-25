@@ -60,7 +60,9 @@ class _ReviewScreenState extends ConsumerState<ReviewScreen> {
             padding: const EdgeInsets.all(16),
             children: [
               Text(
-                '${rooms.length} rooms · $media photos/videos · $issues issues',
+                '${count(rooms.length, 'room')} · '
+                '${count(media, 'photo/video', 'photos/videos')} · '
+                '${count(issues, 'issue')}',
                 style: Theme.of(context).textTheme.titleMedium,
               ),
               const SizedBox(height: 16),

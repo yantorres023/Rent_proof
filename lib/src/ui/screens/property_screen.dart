@@ -220,8 +220,8 @@ class _InspectionCard extends StatelessWidget {
               const SizedBox(height: 4),
               Text(
                 '${summary.completedRoomCount} of ${summary.roomCount} rooms '
-                'done · ${summary.mediaCount} photos/videos · '
-                '${summary.issueCount} issues',
+                'done · ${count(summary.mediaCount, 'photo/video', 'photos/videos')} · '
+                '${count(summary.issueCount, 'issue')}',
                 style: Theme.of(context).textTheme.bodySmall,
               ),
             ],

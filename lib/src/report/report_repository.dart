@@ -210,7 +210,7 @@ class ReportRepository {
         'format': 'rentproof-evidence-package',
         'formatVersion': 1,
         'generatedAt': _clock.now().toIso8601String(),
-        'generator': 'RentProof $appVersion',
+        'generator': '$appName $appVersion',
         'property': {
           'nickname': snap.property.nickname,
           'address': [
@@ -268,8 +268,9 @@ class ReportRepository {
   }
 }
 
-const _readme = '''
-RentProof evidence package
+const _readme =
+    '''
+$appName evidence package
 ==========================
 
 originals/       Photos and videos exactly as stored by the app (unchanged).

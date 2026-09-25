@@ -119,6 +119,7 @@ Future<void> pumpScreen(
       overrides: ui.overrides,
       retry: (_, _) => null,
       child: MaterialApp(
+        debugShowCheckedModeBanner: false,
         theme: buildTheme(Brightness.light),
         home: MediaQuery.withClampedTextScaling(
           minScaleFactor: textScale,

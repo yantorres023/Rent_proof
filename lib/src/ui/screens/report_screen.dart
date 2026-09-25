@@ -226,7 +226,7 @@ class _ReportScreenState extends ConsumerState<ReportScreen> {
                     contentPadding: EdgeInsets.zero,
                     title: Text(dateTimeFormat.format(r.generatedAt)),
                     subtitle: Text(
-                      '${formatBytes(r.byteSize)} · ${r.mediaCount} media'
+                      '${formatBytes(r.byteSize)} · ${count(r.mediaCount, 'photo/video', 'photos/videos')}'
                       '${r.sentToLandlordAt != null ? ' · marked sent' : ''}',
                     ),
                     trailing: PopupMenuButton<String>(
@@ -291,8 +291,8 @@ class _ReportCard extends ConsumerWidget {
                       Text(dateTimeFormat.format(report.generatedAt)),
                       Text(
                         '${formatBytes(report.byteSize)} · '
-                        '${report.mediaCount} photos/videos · '
-                        '${report.issueCount} issues'
+                        '${count(report.mediaCount, 'photo/video', 'photos/videos')} · '
+                        '${count(report.issueCount, 'issue')}'
                         '${report.includesComparison ? ' · with comparison' : ''}',
                         style: theme.textTheme.bodySmall,
                       ),

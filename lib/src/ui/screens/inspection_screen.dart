@@ -296,13 +296,13 @@ class _ProgressHeader extends StatelessWidget {
         ),
         const SizedBox(height: 12),
         Semantics(
-          label: '$done of ${rooms.length} rooms done',
+          label: '$done of ${count(rooms.length, 'room')} done',
           child: ExcludeSemantics(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  '$done of ${rooms.length} rooms done',
+                  '$done of ${count(rooms.length, 'room')} done',
                   style: theme.textTheme.titleMedium,
                 ),
                 const SizedBox(height: 6),
@@ -317,7 +317,8 @@ class _ProgressHeader extends StatelessWidget {
         ),
         const SizedBox(height: 6),
         Text(
-          '$media photos/videos · $issues issues',
+          '${count(media, 'photo/video', 'photos/videos')} · '
+          '${count(issues, 'issue')}',
           style: theme.textTheme.bodySmall,
         ),
       ],
@@ -402,8 +403,8 @@ class _RoomTile extends ConsumerWidget {
                     const SizedBox(height: 4),
                     Text(
                       '${progress.doneCount} of ${progress.totalCount} prompts'
-                      ' · ${progress.mediaCount} media'
-                      '${progress.issueCount > 0 ? ' · ${progress.issueCount} issues' : ''}',
+                      ' · ${count(progress.mediaCount, 'photo/video', 'photos/videos')}'
+                      '${progress.issueCount > 0 ? ' · ${count(progress.issueCount, 'issue')}' : ''}',
                       style: Theme.of(context).textTheme.bodySmall,
                     ),
                     const SizedBox(height: 6),

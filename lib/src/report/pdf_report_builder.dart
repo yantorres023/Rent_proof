@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 
+import '../app_info.dart';
 import '../data/database.dart';
 import 'report_models.dart';
 
@@ -71,8 +72,8 @@ Future<Uint8List> buildReportPdf(ReportInput input, ReportFonts fonts) async {
   final doc = pw.Document(
     title: pdfSafe('Condition record - ${snap.property.nickname}'),
     author: pdfSafe(input.preparedBy),
-    creator: 'RentProof ${input.appVersion}',
-    producer: 'RentProof',
+    creator: '$appName ${input.appVersion}',
+    producer: appName,
     theme: theme,
   );
 
@@ -91,7 +92,7 @@ Future<Uint8List> buildReportPdf(ReportInput input, ReportFonts fonts) async {
   }
 
   final footerText = pdfSafe(
-    'RentProof report ${input.reportId.substring(0, 8)} - '
+    '$appName report ${input.reportId.substring(0, 8)} - '
     'generated ${_ts(input.generatedAt)}',
   );
 
@@ -284,7 +285,7 @@ List<pw.Widget> _cover(ReportInput input, pw.Font mono) {
           '${inspectionTypeLabel(input.baseline!.inspection.type)} inspection '
               'started ${_date.format(input.baseline!.inspection.startedAt)}',
         ),
-      _metaLine('Generated with', 'RentProof ${input.appVersion}'),
+      _metaLine('Generated with', '$appName ${input.appVersion}'),
     ]),
     if (i.notes.isNotEmpty)
       _notesBox('Inspection notes', [
@@ -827,7 +828,7 @@ List<pw.Widget> _limitations(ReportInput input) => [
 /// Plain-language limitations shown in every report and in the app.
 const reportLimitations = [
   'This report is an organized record created by the person named above '
-      'using the RentProof app. It is not an inspection by a licensed '
+      'using the $appName app. It is not an inspection by a licensed '
       'professional and it is not legal advice.',
   'Timestamps come from the device clock at the moment the app stored each '
       'file. The app cannot prove when a scene actually existed or who '

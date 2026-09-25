@@ -12,6 +12,10 @@ import '../../services/media_processing.dart';
 final dateFormat = DateFormat.yMMMd();
 final dateTimeFormat = DateFormat.yMMMd().add_jm();
 
+/// "1 issue", "3 issues". English-only for now (see DECISIONS D-007).
+String count(int n, String singular, [String? plural]) =>
+    '$n ${n == 1 ? singular : (plural ?? '${singular}s')}';
+
 /// Renders loading / error / data states of an [AsyncValue] consistently.
 class AsyncView<T> extends StatelessWidget {
   const AsyncView({super.key, required this.value, required this.builder});

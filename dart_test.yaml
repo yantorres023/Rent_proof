@@ -1,0 +1,4 @@
+tags:
+  golden:
+    # Golden images are rendered on Linux; skip elsewhere with
+    # `flutter test --exclude-tags golden`.

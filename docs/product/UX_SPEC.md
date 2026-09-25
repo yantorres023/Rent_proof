@@ -102,7 +102,7 @@ Before the camera opens, the room/prompt is saved. If the OS kills the app, then
   - Headers are marked, and decorative icons are excluded.
 - Status uses icon + text + color.
 - Reduced motion: onboarding page transitions are instant when the OS disables animations.
-- Keyboard: standard Flutter focus traversal. Form fields submit with the IME action.
+- Keyboard: standard Flutter focus traversal. Single-line dialog fields submit with the IME action.
 - **Limits:** no manual TalkBack/VoiceOver pass was done (no devices). See VALIDATION_DEBT V-10.
 
 ## 9. Visual design

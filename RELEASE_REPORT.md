@@ -125,7 +125,7 @@ drift 2.35.0, drift_flutter 0.3.1, flutter_riverpod 3.4.3, image_picker 1.2.3, i
   - Provisional application ID `app.moveinrecord.mobile`; targetSdk 36; minSdk 24.
   - `key.properties`-based release signing.
   - Cloud backup excluded; device-to-device transfer allowed.
-- **CI on the final commit (65f258a):** see "Final Repository Status".
+- **CI on the final code (1bf6944):** passed (see "Final Repository Status").
 
 ## iOS
 - **Configuration:**
@@ -316,5 +316,7 @@ None known in the tested flows. The following are known **limitations**, not ver
 
 ## Final Repository Status
 - Branch `claude/keen-ptolemy-mgqr0b`, pushed to `origin`. No pull request was opened.
-- Working tree is clean after the final commit.
-- CI on commit f6e738d (after which only docs, the HEIC fallback, security hardening and the backup-status feature changed) passed all jobs. CI for the final commit is recorded in the section below.
+- **CI on commit 1bf6944 (all app code in its final state) passed every job:**
+  - [CI run 36135588481](https://github.com/yantorres023/Rent_proof/actions/runs/36135588481): generated code check, format, analyze, 94 tests including goldens, Android APK + AAB build, and the permission audit.
+  - [iOS run 36135588533](https://github.com/yantorres023/Rent_proof/actions/runs/36135588533): tests, then `flutter build ios --release --no-codesign`.
+- Later commits change only this report.

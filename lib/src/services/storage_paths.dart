@@ -71,6 +71,14 @@ class StoragePaths {
     }
   }
 
+  /// Deletes all evidence, reports and exports.
+  Future<void> deleteAll() async {
+    for (final path in [evidenceRoot, reportsRoot, exportRoot]) {
+      final dir = Directory(path);
+      if (dir.existsSync()) await dir.delete(recursive: true);
+    }
+  }
+
   Future<void> clearExports() async {
     final dir = Directory(exportRoot);
     if (dir.existsSync()) await dir.delete(recursive: true);

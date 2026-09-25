@@ -61,10 +61,9 @@ class PropertyRepository {
   PropertyRepository(
     this._db,
     this._paths, {
-    Clock clock = const SystemClock(),
-    IdGenerator ids = const IdGenerator(),
-  }) : _clock = clock,
-       _ids = ids;
+    this._clock = const SystemClock(),
+    this._ids = const IdGenerator(),
+  });
 
   final AppDatabase _db;
   final StoragePaths _paths;
@@ -138,7 +137,8 @@ class PropertyRepository {
           PropertySummary(
             property: r.readTable(_db.properties),
             inspectionCount: r.read(count) ?? 0,
-            lastInspectionAt: r.read(last),
+            // Aggregates over text timestamps are parsed as UTC.
+            lastInspectionAt: r.read(last)?.toLocal(),
           ),
       ],
     );

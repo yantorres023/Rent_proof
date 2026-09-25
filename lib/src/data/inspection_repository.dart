@@ -69,10 +69,9 @@ class InspectionRepository {
   InspectionRepository(
     this._db,
     this._paths, {
-    Clock clock = const SystemClock(),
-    IdGenerator ids = const IdGenerator(),
-  }) : _clock = clock,
-       _ids = ids;
+    this._clock = const SystemClock(),
+    this._ids = const IdGenerator(),
+  });
 
   final AppDatabase _db;
   final StoragePaths _paths;
@@ -127,8 +126,7 @@ class InspectionRepository {
           );
         }
       }
-      await (_db.update(_db.properties)
-            ..where((t) => t.id.equals(propertyId)))
+      await (_db.update(_db.properties)..where((t) => t.id.equals(propertyId)))
           .write(PropertiesCompanion(updatedAt: Value(now)));
     });
     return getInspection(id);
@@ -232,13 +230,14 @@ class InspectionRepository {
     if (mediaCount == 0) {
       throw const InspectionNotReadyException('no_media');
     }
-    await (_db.update(_db.inspections)..where((t) => t.id.equals(inspectionId)))
-        .write(
-          InspectionsCompanion(
-            status: const Value(InspectionStatus.completed),
-            completedAt: Value(_clock.now()),
-          ),
-        );
+    await (_db.update(
+      _db.inspections,
+    )..where((t) => t.id.equals(inspectionId))).write(
+      InspectionsCompanion(
+        status: const Value(InspectionStatus.completed),
+        completedAt: Value(_clock.now()),
+      ),
+    );
   }
 
   /// Reopens a completed inspection so evidence can be added. Reports that
@@ -452,7 +451,9 @@ class InspectionRepository {
       return;
     }
     await (_db.update(_db.rooms)..where((t) => t.id.equals(roomId))).write(
-      RoomsCompanion(name: Value(await _uniqueRoomName(room.inspectionId, name))),
+      RoomsCompanion(
+        name: Value(await _uniqueRoomName(room.inspectionId, name)),
+      ),
     );
   }
 

@@ -198,7 +198,7 @@ pw.Widget _metaLine(String key, String value, {pw.Font? font}) => pw.Padding(
       style: const pw.TextStyle(fontSize: 6.5, color: _ink),
       children: [
         pw.TextSpan(
-          text: '$key: ',
+          text: key.isEmpty ? '' : '$key: ',
           style: const pw.TextStyle(color: _metaColor),
         ),
         pw.TextSpan(
@@ -263,11 +263,7 @@ List<pw.Widget> _cover(ReportInput input, pw.Font mono) {
         style: const pw.TextStyle(fontSize: 10),
       ),
     pw.SizedBox(height: 10),
-    pw.Row(
-      children: [
-        _label('APP-GENERATED METADATA', _metaColor),
-      ],
-    ),
+    pw.Row(children: [_label('APP-GENERATED METADATA', _metaColor)]),
     pw.SizedBox(height: 3),
     _metaBox([
       _metaLine('Inspection started (device clock)', _ts(i.startedAt)),
@@ -413,13 +409,18 @@ List<pw.Widget> _room(
   if (room.room.notes.isNotEmpty) {
     widgets.add(
       _notesBox('Room notes', [
-        pw.Text(pdfSafe(room.room.notes), style: const pw.TextStyle(fontSize: 9)),
+        pw.Text(
+          pdfSafe(room.room.notes),
+          style: const pw.TextStyle(fontSize: 9),
+        ),
       ]),
     );
   }
 
   for (final issue in room.issues) {
-    final linked = issue.mediaId == null ? null : snap.mediaById(issue.mediaId!);
+    final linked = issue.mediaId == null
+        ? null
+        : snap.mediaById(issue.mediaId!);
     widgets.add(
       _notesBox('Issue: ${issue.title}', [
         pw.Text(
@@ -648,7 +649,10 @@ List<pw.Widget> _comparison(ReportInput input, _ImageLookup imageFor) {
         'Verdict: ${verdictLabel(verdict?.verdict ?? ComparisonVerdict.notReviewed)}',
         [
           if (verdict != null && verdict.note.isNotEmpty)
-            pw.Text(pdfSafe(verdict.note), style: const pw.TextStyle(fontSize: 8)),
+            pw.Text(
+              pdfSafe(verdict.note),
+              style: const pw.TextStyle(fontSize: 8),
+            ),
           pw.Text(
             pdfSafe(
               'Issues - baseline: ${pair.baseline?.issues.length ?? 0}'
@@ -675,10 +679,13 @@ List<pw.Widget> _comparison(ReportInput input, _ImageLookup imageFor) {
           children: [
             pw.Padding(
               padding: const pw.EdgeInsets.all(3),
-              child: pw.Text(pdfSafe(label), style: const pw.TextStyle(fontSize: 8)),
+              child: pw.Text(
+                pdfSafe(label),
+                style: const pw.TextStyle(fontSize: 8),
+              ),
             ),
-            _thumbCell(b, imageFor),
-            _thumbCell(c, imageFor),
+            _thumbCell(b, imageFor, 'Baseline '),
+            _thumbCell(c, imageFor, ''),
           ],
         ),
       );
@@ -719,8 +726,9 @@ List<pw.Widget> _comparison(ReportInput input, _ImageLookup imageFor) {
   return widgets;
 }
 
-String _issueTitles(RoomEntry room) =>
-    room.issues.isEmpty ? '' : ' (${room.issues.map((i) => i.title).join('; ')})';
+String _issueTitles(RoomEntry room) => room.issues.isEmpty
+    ? ''
+    : ' (${room.issues.map((i) => i.title).join('; ')})';
 
 MediaEntry? _firstPhoto(RoomEntry? room, String label) {
   if (room == null) return null;
@@ -730,7 +738,12 @@ MediaEntry? _firstPhoto(RoomEntry? room, String label) {
   return null;
 }
 
-pw.Widget _thumbCell(MediaEntry? entry, _ImageLookup imageFor) {
+/// [idPrefix] disambiguates evidence IDs, which are numbered per report.
+pw.Widget _thumbCell(
+  MediaEntry? entry,
+  _ImageLookup imageFor,
+  String idPrefix,
+) {
   if (entry == null) {
     return pw.Padding(
       padding: const pw.EdgeInsets.all(3),
@@ -757,7 +770,8 @@ pw.Widget _thumbCell(MediaEntry? entry, _ImageLookup imageFor) {
             style: const pw.TextStyle(fontSize: 7.5),
           ),
         pw.Text(
-          '${entry.evidenceId} - ${_date.format(entry.media.recordedAt)}',
+          '$idPrefix${entry.evidenceId} - '
+          '${_date.format(entry.media.recordedAt)}',
           style: const pw.TextStyle(fontSize: 6.5, color: _metaColor),
         ),
       ],

@@ -148,16 +148,14 @@ Future<MediaProcessResult> processMedia(MediaProcessRequest req) async {
         final preview = _resize(oriented, previewMaxEdge);
         // Derived JPEGs carry no EXIF (no GPS, no device identifiers).
         preview.exif = img.ExifData();
-        File(
-          req.previewDestPath!,
-        ).writeAsBytesSync(img.encodeJpg(preview, quality: 82));
+        File(req.previewDestPath!)
+            .writeAsBytesSync(img.encodeJpg(preview, quality: 82));
         previewWritten = true;
         if (req.thumbnailDestPath != null) {
           final thumb = _resize(preview, thumbnailMaxEdge);
           thumb.exif = img.ExifData();
-          File(
-            req.thumbnailDestPath!,
-          ).writeAsBytesSync(img.encodeJpg(thumb, quality: 75));
+          File(req.thumbnailDestPath!)
+              .writeAsBytesSync(img.encodeJpg(thumb, quality: 75));
           thumbWritten = true;
         }
       }

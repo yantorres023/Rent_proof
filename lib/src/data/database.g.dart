@@ -5556,6 +5556,18 @@ class $ReportsTable extends Reports with TableInfo<$ReportsTable, Report> {
     type: DriftSqlType.dateTime,
     requiredDuringInsert: true,
   );
+  static const VerificationMeta _sentToLandlordAtMeta = const VerificationMeta(
+    'sentToLandlordAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> sentToLandlordAt =
+      GeneratedColumn<DateTime>(
+        'sent_to_landlord_at',
+        aliasedName,
+        true,
+        type: DriftSqlType.dateTime,
+        requiredDuringInsert: false,
+      );
   @override
   List<GeneratedColumn> get $columns => [
     id,
@@ -5567,6 +5579,7 @@ class $ReportsTable extends Reports with TableInfo<$ReportsTable, Report> {
     issueCount,
     includesComparison,
     generatedAt,
+    sentToLandlordAt,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -5656,6 +5669,15 @@ class $ReportsTable extends Reports with TableInfo<$ReportsTable, Report> {
     } else if (isInserting) {
       context.missing(_generatedAtMeta);
     }
+    if (data.containsKey('sent_to_landlord_at')) {
+      context.handle(
+        _sentToLandlordAtMeta,
+        sentToLandlordAt.isAcceptableOrUnknown(
+          data['sent_to_landlord_at']!,
+          _sentToLandlordAtMeta,
+        ),
+      );
+    }
     return context;
   }
 
@@ -5701,6 +5723,10 @@ class $ReportsTable extends Reports with TableInfo<$ReportsTable, Report> {
         DriftSqlType.dateTime,
         data['${effectivePrefix}generated_at'],
       )!,
+      sentToLandlordAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}sent_to_landlord_at'],
+      ),
     );
   }
 
@@ -5722,6 +5748,10 @@ class Report extends DataClass implements Insertable<Report> {
   final int issueCount;
   final bool includesComparison;
   final DateTime generatedAt;
+
+  /// When the user confirmed they sent this report to the landlord/manager.
+  /// Self-reported; the email provider's sent record is the stronger proof.
+  final DateTime? sentToLandlordAt;
   const Report({
     required this.id,
     required this.inspectionId,
@@ -5732,6 +5762,7 @@ class Report extends DataClass implements Insertable<Report> {
     required this.issueCount,
     required this.includesComparison,
     required this.generatedAt,
+    this.sentToLandlordAt,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -5745,6 +5776,9 @@ class Report extends DataClass implements Insertable<Report> {
     map['issue_count'] = Variable<int>(issueCount);
     map['includes_comparison'] = Variable<bool>(includesComparison);
     map['generated_at'] = Variable<DateTime>(generatedAt);
+    if (!nullToAbsent || sentToLandlordAt != null) {
+      map['sent_to_landlord_at'] = Variable<DateTime>(sentToLandlordAt);
+    }
     return map;
   }
 
@@ -5759,6 +5793,9 @@ class Report extends DataClass implements Insertable<Report> {
       issueCount: Value(issueCount),
       includesComparison: Value(includesComparison),
       generatedAt: Value(generatedAt),
+      sentToLandlordAt: sentToLandlordAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(sentToLandlordAt),
     );
   }
 
@@ -5777,6 +5814,9 @@ class Report extends DataClass implements Insertable<Report> {
       issueCount: serializer.fromJson<int>(json['issueCount']),
       includesComparison: serializer.fromJson<bool>(json['includesComparison']),
       generatedAt: serializer.fromJson<DateTime>(json['generatedAt']),
+      sentToLandlordAt: serializer.fromJson<DateTime?>(
+        json['sentToLandlordAt'],
+      ),
     );
   }
   @override
@@ -5792,6 +5832,7 @@ class Report extends DataClass implements Insertable<Report> {
       'issueCount': serializer.toJson<int>(issueCount),
       'includesComparison': serializer.toJson<bool>(includesComparison),
       'generatedAt': serializer.toJson<DateTime>(generatedAt),
+      'sentToLandlordAt': serializer.toJson<DateTime?>(sentToLandlordAt),
     };
   }
 
@@ -5805,6 +5846,7 @@ class Report extends DataClass implements Insertable<Report> {
     int? issueCount,
     bool? includesComparison,
     DateTime? generatedAt,
+    Value<DateTime?> sentToLandlordAt = const Value.absent(),
   }) => Report(
     id: id ?? this.id,
     inspectionId: inspectionId ?? this.inspectionId,
@@ -5815,6 +5857,9 @@ class Report extends DataClass implements Insertable<Report> {
     issueCount: issueCount ?? this.issueCount,
     includesComparison: includesComparison ?? this.includesComparison,
     generatedAt: generatedAt ?? this.generatedAt,
+    sentToLandlordAt: sentToLandlordAt.present
+        ? sentToLandlordAt.value
+        : this.sentToLandlordAt,
   );
   Report copyWithCompanion(ReportsCompanion data) {
     return Report(
@@ -5837,6 +5882,9 @@ class Report extends DataClass implements Insertable<Report> {
       generatedAt: data.generatedAt.present
           ? data.generatedAt.value
           : this.generatedAt,
+      sentToLandlordAt: data.sentToLandlordAt.present
+          ? data.sentToLandlordAt.value
+          : this.sentToLandlordAt,
     );
   }
 
@@ -5851,7 +5899,8 @@ class Report extends DataClass implements Insertable<Report> {
           ..write('mediaCount: $mediaCount, ')
           ..write('issueCount: $issueCount, ')
           ..write('includesComparison: $includesComparison, ')
-          ..write('generatedAt: $generatedAt')
+          ..write('generatedAt: $generatedAt, ')
+          ..write('sentToLandlordAt: $sentToLandlordAt')
           ..write(')'))
         .toString();
   }
@@ -5867,6 +5916,7 @@ class Report extends DataClass implements Insertable<Report> {
     issueCount,
     includesComparison,
     generatedAt,
+    sentToLandlordAt,
   );
   @override
   bool operator ==(Object other) =>
@@ -5880,7 +5930,8 @@ class Report extends DataClass implements Insertable<Report> {
           other.mediaCount == this.mediaCount &&
           other.issueCount == this.issueCount &&
           other.includesComparison == this.includesComparison &&
-          other.generatedAt == this.generatedAt);
+          other.generatedAt == this.generatedAt &&
+          other.sentToLandlordAt == this.sentToLandlordAt);
 }
 
 class ReportsCompanion extends UpdateCompanion<Report> {
@@ -5893,6 +5944,7 @@ class ReportsCompanion extends UpdateCompanion<Report> {
   final Value<int> issueCount;
   final Value<bool> includesComparison;
   final Value<DateTime> generatedAt;
+  final Value<DateTime?> sentToLandlordAt;
   final Value<int> rowid;
   const ReportsCompanion({
     this.id = const Value.absent(),
@@ -5904,6 +5956,7 @@ class ReportsCompanion extends UpdateCompanion<Report> {
     this.issueCount = const Value.absent(),
     this.includesComparison = const Value.absent(),
     this.generatedAt = const Value.absent(),
+    this.sentToLandlordAt = const Value.absent(),
     this.rowid = const Value.absent(),
   });
   ReportsCompanion.insert({
@@ -5916,6 +5969,7 @@ class ReportsCompanion extends UpdateCompanion<Report> {
     required int issueCount,
     this.includesComparison = const Value.absent(),
     required DateTime generatedAt,
+    this.sentToLandlordAt = const Value.absent(),
     this.rowid = const Value.absent(),
   }) : id = Value(id),
        inspectionId = Value(inspectionId),
@@ -5935,6 +5989,7 @@ class ReportsCompanion extends UpdateCompanion<Report> {
     Expression<int>? issueCount,
     Expression<bool>? includesComparison,
     Expression<DateTime>? generatedAt,
+    Expression<DateTime>? sentToLandlordAt,
     Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
@@ -5947,6 +6002,7 @@ class ReportsCompanion extends UpdateCompanion<Report> {
       if (issueCount != null) 'issue_count': issueCount,
       if (includesComparison != null) 'includes_comparison': includesComparison,
       if (generatedAt != null) 'generated_at': generatedAt,
+      if (sentToLandlordAt != null) 'sent_to_landlord_at': sentToLandlordAt,
       if (rowid != null) 'rowid': rowid,
     });
   }
@@ -5961,6 +6017,7 @@ class ReportsCompanion extends UpdateCompanion<Report> {
     Value<int>? issueCount,
     Value<bool>? includesComparison,
     Value<DateTime>? generatedAt,
+    Value<DateTime?>? sentToLandlordAt,
     Value<int>? rowid,
   }) {
     return ReportsCompanion(
@@ -5973,6 +6030,7 @@ class ReportsCompanion extends UpdateCompanion<Report> {
       issueCount: issueCount ?? this.issueCount,
       includesComparison: includesComparison ?? this.includesComparison,
       generatedAt: generatedAt ?? this.generatedAt,
+      sentToLandlordAt: sentToLandlordAt ?? this.sentToLandlordAt,
       rowid: rowid ?? this.rowid,
     );
   }
@@ -6007,6 +6065,9 @@ class ReportsCompanion extends UpdateCompanion<Report> {
     if (generatedAt.present) {
       map['generated_at'] = Variable<DateTime>(generatedAt.value);
     }
+    if (sentToLandlordAt.present) {
+      map['sent_to_landlord_at'] = Variable<DateTime>(sentToLandlordAt.value);
+    }
     if (rowid.present) {
       map['rowid'] = Variable<int>(rowid.value);
     }
@@ -6025,6 +6086,7 @@ class ReportsCompanion extends UpdateCompanion<Report> {
           ..write('issueCount: $issueCount, ')
           ..write('includesComparison: $includesComparison, ')
           ..write('generatedAt: $generatedAt, ')
+          ..write('sentToLandlordAt: $sentToLandlordAt, ')
           ..write('rowid: $rowid')
           ..write(')'))
         .toString();
@@ -11641,6 +11703,7 @@ typedef $$ReportsTableCreateCompanionBuilder = ReportsCompanion Function({
   required int issueCount,
   Value<bool> includesComparison,
   required DateTime generatedAt,
+  Value<DateTime?> sentToLandlordAt,
   Value<int> rowid,
 });
 typedef $$ReportsTableUpdateCompanionBuilder = ReportsCompanion Function({
@@ -11653,6 +11716,7 @@ typedef $$ReportsTableUpdateCompanionBuilder = ReportsCompanion Function({
   Value<int> issueCount,
   Value<bool> includesComparison,
   Value<DateTime> generatedAt,
+  Value<DateTime?> sentToLandlordAt,
   Value<int> rowid,
 });
 
@@ -11724,6 +11788,11 @@ class $$ReportsTableFilterComposer
 
   ColumnFilters<DateTime> get generatedAt => $composableBuilder(
     column: $table.generatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get sentToLandlordAt => $composableBuilder(
+    column: $table.sentToLandlordAt,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -11800,6 +11869,11 @@ class $$ReportsTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<DateTime> get sentToLandlordAt => $composableBuilder(
+    column: $table.sentToLandlordAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   $$InspectionsTableOrderingComposer get inspectionId {
     final $$InspectionsTableOrderingComposer composer = $composerBuilder(
       composer: this,
@@ -11865,6 +11939,11 @@ class $$ReportsTableAnnotationComposer
     builder: (column) => column,
   );
 
+  GeneratedColumn<DateTime> get sentToLandlordAt => $composableBuilder(
+    column: $table.sentToLandlordAt,
+    builder: (column) => column,
+  );
+
   $$InspectionsTableAnnotationComposer get inspectionId {
     final $$InspectionsTableAnnotationComposer composer = $composerBuilder(
       composer: this,
@@ -11926,6 +12005,7 @@ class $$ReportsTableTableManager
                 Value<int> issueCount = const Value.absent(),
                 Value<bool> includesComparison = const Value.absent(),
                 Value<DateTime> generatedAt = const Value.absent(),
+                Value<DateTime?> sentToLandlordAt = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => ReportsCompanion(
                 id: id,
@@ -11937,6 +12017,7 @@ class $$ReportsTableTableManager
                 issueCount: issueCount,
                 includesComparison: includesComparison,
                 generatedAt: generatedAt,
+                sentToLandlordAt: sentToLandlordAt,
                 rowid: rowid,
               ),
           createCompanionCallback:
@@ -11950,6 +12031,7 @@ class $$ReportsTableTableManager
                 required int issueCount,
                 Value<bool> includesComparison = const Value.absent(),
                 required DateTime generatedAt,
+                Value<DateTime?> sentToLandlordAt = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => ReportsCompanion.insert(
                 id: id,
@@ -11961,6 +12043,7 @@ class $$ReportsTableTableManager
                 issueCount: issueCount,
                 includesComparison: includesComparison,
                 generatedAt: generatedAt,
+                sentToLandlordAt: sentToLandlordAt,
                 rowid: rowid,
               ),
           withReferenceMapper: (p0) => p0

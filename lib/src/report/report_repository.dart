@@ -17,9 +17,11 @@ import 'pdf_report_builder.dart';
 import 'report_models.dart';
 import 'snapshot_loader.dart';
 
-typedef FontLoader = Future<ReportFonts> Function();
-typedef PdfRunner =
-    Future<List<int>> Function(ReportInput input, ReportFonts fonts);
+typedef ReportFontLoader = Future<ReportFonts> Function();
+typedef PdfRunner = Future<List<int>> Function(
+  ReportInput input,
+  ReportFonts fonts,
+);
 
 /// Builds the PDF on a background isolate.
 Future<List<int>> buildPdfInIsolate(ReportInput input, ReportFonts fonts) =>
@@ -29,19 +31,15 @@ class ReportRepository {
   ReportRepository(
     this._db,
     this._paths, {
-    required FontLoader fonts,
-    Clock clock = const SystemClock(),
-    IdGenerator ids = const IdGenerator(),
-    PdfRunner runner = buildPdfInIsolate,
-  }) : _fonts = fonts,
-       _clock = clock,
-       _ids = ids,
-       _runner = runner,
-       _loader = SnapshotLoader(_db, _paths);
+    required this._fonts,
+    this._clock = const SystemClock(),
+    this._ids = const IdGenerator(),
+    this._runner = buildPdfInIsolate,
+  }) : _loader = SnapshotLoader(_db, _paths);
 
   final AppDatabase _db;
   final StoragePaths _paths;
-  final FontLoader _fonts;
+  final ReportFontLoader _fonts;
   final Clock _clock;
   final IdGenerator _ids;
   final PdfRunner _runner;
@@ -61,9 +59,7 @@ class ReportRepository {
       )..where((t) => t.id.equals(baselineId))).getSingleOrNull();
       if (exists != null) baseline = await _loader.load(baselineId);
     }
-    final profile = await (_db.select(
-      _db.userProfiles,
-    )).getSingleOrNull();
+    final profile = await (_db.select(_db.userProfiles)).getSingleOrNull();
     return ReportInput(
       reportId: _ids.next(),
       generatedAt: _clock.now(),
@@ -111,6 +107,13 @@ class ReportRepository {
           .watch();
 
   String reportFilePath(Report r) => _paths.reportFile(r.filePath);
+
+  /// Records (or clears) the user's confirmation that the report was sent.
+  Future<void> markSent(String reportId, {required bool sent}) async {
+    await (_db.update(_db.reports)..where((t) => t.id.equals(reportId))).write(
+      ReportsCompanion(sentToLandlordAt: Value(sent ? _clock.now() : null)),
+    );
+  }
 
   Future<void> deleteReport(String reportId) async {
     final r = await (_db.select(
@@ -252,12 +255,8 @@ class ReportRepository {
         'missingOriginals': missing,
         'limitations': reportLimitations,
       };
-      final manifestJson = const JsonEncoder.withIndent(
-        '  ',
-      ).convert(manifest);
-      encoder.addArchiveFile(
-        ArchiveFile.string('manifest.json', manifestJson),
-      );
+      final manifestJson = const JsonEncoder.withIndent('  ').convert(manifest);
+      encoder.addArchiveFile(ArchiveFile.string('manifest.json', manifestJson));
       encoder.addArchiveFile(
         ArchiveFile.string('SHA256SUMS.txt', sums.toString()),
       );

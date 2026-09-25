@@ -80,11 +80,8 @@ class Rooms extends Table {
   TextColumn get notes => text().withDefault(const Constant(''))();
 
   /// Matching room in the baseline inspection, if any.
-  TextColumn get baselineRoomId => text().nullable().references(
-    Rooms,
-    #id,
-    onDelete: KeyAction.setNull,
-  )();
+  TextColumn get baselineRoomId =>
+      text().nullable().references(Rooms, #id, onDelete: KeyAction.setNull)();
   DateTimeColumn get completedAt => dateTime().nullable()();
 
   @override
@@ -198,11 +195,8 @@ class Annotations extends Table {
   TextColumn get id => text()();
   TextColumn get mediaId =>
       text().references(MediaEvidence, #id, onDelete: KeyAction.cascade)();
-  TextColumn get issueId => text().nullable().references(
-    Issues,
-    #id,
-    onDelete: KeyAction.cascade,
-  )();
+  TextColumn get issueId =>
+      text().nullable().references(Issues, #id, onDelete: KeyAction.cascade)();
 
   /// Normalized position (0..1) relative to the displayed image.
   RealColumn get x => real()();
@@ -228,6 +222,10 @@ class Reports extends Table {
   BoolColumn get includesComparison =>
       boolean().withDefault(const Constant(false))();
   DateTimeColumn get generatedAt => dateTime()();
+
+  /// When the user confirmed they sent this report to the landlord/manager.
+  /// Self-reported; the email provider's sent record is the stronger proof.
+  DateTimeColumn get sentToLandlordAt => dateTime().nullable()();
 
   @override
   Set<Column> get primaryKey => {id};

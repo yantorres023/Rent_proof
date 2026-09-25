@@ -44,8 +44,9 @@ class IssueInput {
   final String? mediaId;
 }
 
-typedef MediaProcessor =
-    Future<MediaProcessResult> Function(MediaProcessRequest request);
+typedef MediaProcessor = Future<MediaProcessResult> Function(
+  MediaProcessRequest request,
+);
 
 /// Runs [processMedia] on a background isolate so hashing and resizing never
 /// block the UI thread.
@@ -56,12 +57,10 @@ class EvidenceRepository {
   EvidenceRepository(
     this._db,
     this._paths, {
-    Clock clock = const SystemClock(),
-    IdGenerator ids = const IdGenerator(),
-    MediaProcessor processor = processMediaInIsolate,
-  }) : _clock = clock,
-       _ids = ids,
-       _processor = processor;
+    this._clock = const SystemClock(),
+    this._ids = const IdGenerator(),
+    this._processor = processMediaInIsolate,
+  });
 
   final AppDatabase _db;
   final StoragePaths _paths;
@@ -163,8 +162,11 @@ class EvidenceRepository {
               ),
             );
         if (room.status == RoomStatus.notStarted) {
-          await (_db.update(_db.rooms)..where((t) => t.id.equals(roomId)))
-              .write(const RoomsCompanion(status: Value(RoomStatus.inProgress)));
+          await (_db.update(
+            _db.rooms,
+          )..where((t) => t.id.equals(roomId))).write(
+            const RoomsCompanion(status: Value(RoomStatus.inProgress)),
+          );
         }
       });
     } on Object {
@@ -303,14 +305,18 @@ class EvidenceRepository {
           .watch();
 
   Future<List<MediaItem>> mediaForInspection(String inspectionId) {
-    final query = _db.select(_db.mediaEvidence).join([
-      innerJoin(_db.rooms, _db.rooms.id.equalsExp(_db.mediaEvidence.roomId)),
-    ])
-      ..where(_db.rooms.inspectionId.equals(inspectionId))
-      ..orderBy([
-        OrderingTerm.asc(_db.rooms.position),
-        OrderingTerm.asc(_db.mediaEvidence.recordedAt),
-      ]);
+    final query =
+        _db.select(_db.mediaEvidence).join([
+            innerJoin(
+              _db.rooms,
+              _db.rooms.id.equalsExp(_db.mediaEvidence.roomId),
+            ),
+          ])
+          ..where(_db.rooms.inspectionId.equals(inspectionId))
+          ..orderBy([
+            OrderingTerm.asc(_db.rooms.position),
+            OrderingTerm.asc(_db.mediaEvidence.recordedAt),
+          ]);
     return query.map((r) => r.readTable(_db.mediaEvidence)).get();
   }
 

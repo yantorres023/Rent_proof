@@ -54,6 +54,11 @@ void main() {
     testWidgets('golden ${entry.key}', (tester) async {
       final ui = await createUiEnv(tester);
       final s = await seed(ui, tester);
+      // PDF bytes embed a random document ID and creation time, so the
+      // displayed size can vary by a few bytes; pin it for a stable image.
+      await tester.runAsync(
+        () => ui.env.db.customStatement('UPDATE reports SET byte_size = 34000'),
+      );
       await pumpScreen(tester, ui, entry.value(s));
       await expectLater(
         find.byType(MaterialApp),
